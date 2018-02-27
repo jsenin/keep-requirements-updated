@@ -1,0 +1,10 @@
+args==0.1.0
+clint==0.5.1
+coverage==4.5.1
+doublex==1.8.4
+doublex-expects==0.6.0
+expects==0.8.0
+mamba==0.9.2
+pkg-resources==0.0.0
+PyHamcrest==1.9.0
+six==1.11.0
