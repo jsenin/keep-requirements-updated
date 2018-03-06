@@ -49,29 +49,33 @@ def parse_arguments():
                         default=['requirements.txt', 'requirements-dev.txt'],
                         help='requirement filenames')
     parser.add_argument('path',
-                        type=str,
-                        default='./',
                         help='starting path')
-    parser.add_argument('--recursive', '-r',
+    parser.add_argument('-r', '--recursive',
                         required=False,
-                        type=bool,
                         default=False,
-                        nargs=0,
+                        action="store_true",
                         help='recursive search')
 
     return parser.parse_args()
 
 
-def subdirectory_search(start_path, requirement_files, recursive):
-    default_files = ["{path}{file}".format(path=start_path, file=file) for file in requirement_files]
-    found_files = default_files
+def subdirectory_search(path, requirement_files, recursive):
+    found_files = []
+    for file in requirement_files:
+        filepath = "{path}/{file}".format(path=path, file=file)
+        if os.path.exists(filepath):
+            found_files.append(filepath)
+
     if recursive:
-        walk = os.walk(start_path)
-        for dir_path, dir_names, files in walk:
-            match = set(files) & set(requirement_files)
-            found_files = found_files + ["{path}{file}".format(path=dir_path, file=file) for file in match]
+        walker = os.walk(path)
+        for dir_path, dir_names, files in walker:
+            existing_files = set(files) & set(requirement_files)
+            for file in existing_files:
+                filepath = "{path}/{file}".format(path=dir_path, file=file)
+                found_files.append(filepath)
 
     return found_files
+
 
 def __main__():
     arguments = parse_arguments()
@@ -80,8 +84,6 @@ def __main__():
     recursive = arguments.recursive
 
     for filename in subdirectory_search(start_path, filenames, recursive):
-        if os.path.exists(filename):
-            process(filename)
-
+        process(filename)
 
 __main__()
